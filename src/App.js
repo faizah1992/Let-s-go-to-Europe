@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import CountryCard from './Components/countryCard'
-import { Row, Input, Navbar } from 'rsuite'
+import { Row, Input, Navbar, Grid } from 'rsuite'
+import 'rsuite/dist/styles/rsuite-default.css';
 import "./App.css";
 
 class App extends Component {
@@ -89,8 +90,12 @@ class App extends Component {
     }
     else {
     return (
-     
-    <div className="App">
+      <div className="App">
+        <Navbar className="navbar">
+         <Navbar.Header style={{ fontSize: "1.5rem"}}>
+          Let's go to Europe!
+         </Navbar.Header>
+        </Navbar>
       <Input placeholder="Search Subregion" onChange={(e)=>this.handleSubregion(e)}/>
       <select name="choice" onChange={ this.handleLanguage}>
           <option value="0" ># of languages</option>
@@ -106,12 +111,13 @@ class App extends Component {
           <option value="3" >Population Low-high</option>
           <option value="4" >Population High-low</option>
       </select>
+      <Grid fluid>
       <Row>
         {countriesToShow.map(country => (
           <CountryCard country={country} key={country.id}/>  
         ))}
       </Row>
-
+      </Grid>
     </div>  
     )
     }
