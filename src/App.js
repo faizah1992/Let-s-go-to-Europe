@@ -1,25 +1,121 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import CountryCard from './Components/countryCard'
+import { Row, Input, Navbar } from 'rsuite'
+import "./App.css";
 
-function App() {
-  return (
+class App extends Component {
+  
+    state = {
+      countries: [],
+      isLoaded: false,
+      countriesToShow: [],
+      languages: 0,
+    }
+
+  componentDidMount() {
+    fetch('https://restcountries.eu/rest/v2/region/europe')
+    .then(res => res.json())
+    .then(countries => {
+      console.log(countries)
+      this.setState({
+        isLoaded: true,
+        countries: countries,
+        countriesToShow: countries,
+      })
+    })
+  }
+
+  handleSubregion = (e) => {
+    // debugger
+    // console.log(countriesToShow)
+    const countriesToShow = this.state.countries.filter(country => country.subregion.toLowerCase().includes(e.toLowerCase()))
+    this.setState({ countriesToShow: countriesToShow})
+    console.log(countriesToShow)
+  }
+
+  handleLanguage = (e) => {
+
+    let num = e.target.selectedIndex
+    const countriesToShow = this.state.countries.filter(country => {
+      if (num === 0) {
+        return true
+      }
+      else if ( num === 1 || num === 2){
+        return country.languages.length === num
+      }
+      else {
+        return country.languages.length >= num
+      }
+    })
+    this.setState({ countriesToShow: countriesToShow})
+  }
+
+  sortCountries = (e) => {
+    let index = e.target.selectedIndex
+    if (index === 0) {
+      return true
+    }
+    else if (index === 1) {
+      this.setState({
+        countriesToShow: this.state.countriesToShow.sort((a, b) => (a.name.localeCompare(b.name))) 
+      })
+    }
+    else if (index === 2) {
+      this.setState({
+        countriesToShow: this.state.countriesToShow.sort((a, b) => (b.name.localeCompare(a.name)))
+      })
+    }
+    else if (index === 3) {
+      this.setState({
+        countriesToShow: this.state.countriesToShow.sort((a, b) => (a.population - b.population))
+      })
+    }
+    else if (index === 4){
+      this.setState({
+        countriesToShow: this.state.countriesToShow.sort((a, b) => (b.population - a.population))
+      })
+    }
+
+  }
+
+
+
+
+
+  render() {
+    var{ isLoaded, countries, countriesToShow } = this.state
+    if (!isLoaded) {
+      return <div>Loading...</div>
+    }
+    else {
+    return (
+     
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+      <Input placeholder="Search Subregion" onChange={(e)=>this.handleSubregion(e)}/>
+      <select name="choice" onChange={ this.handleLanguage}>
+          <option value="0" ># of languages</option>
+          <option value="1" >1</option>
+          <option value="2" >2</option>
+          <option value="3+" >3+</option>
+      </select>
+
+      <select name="choice" onChange={this.sortCountries}>
+          <option value="0" >Sort</option>
+          <option value="1" >A-Z</option>
+          <option value="2" >Z-A</option>
+          <option value="3" >Population Low-high</option>
+          <option value="4" >Population High-low</option>
+      </select>
+      <Row>
+        {countriesToShow.map(country => (
+          <CountryCard country={country} key={country.id}/>  
+        ))}
+      </Row>
+
+    </div>  
+    )
+    }
+  }
 }
 
 export default App;
